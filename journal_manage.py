@@ -37,7 +37,7 @@ class JournalMangaement :
             return {"title": "Image-based PDF", "author": "Image-based PDF", "acknowledgments": "Image-based PDF"}   
         if journal.data_clensing_front() :
             journal.data_clensing_back()
-        return f"해당 논문에서 {self.first_q} \n지금 너에게 준 형식들로 맞춰서 나에게 알려줘(형식의 텍스트를 절대 바꾸지 말고 꼭 유지해줘)\n 없을 경우 None으로 표시해줘\n" + journal.get_data() 
+        return f"해당 논문에서 {self.first_q} \n지금 너에게 준 형식들로 맞춰서 나에게 알려줘(형식을 절대 바꾸지 말고 꼭 유지해줘)\n 항목이 여러개인 경우 ','으로 구분해주고 항목이 없을 경우 None으로 표시해줘\n" + journal.get_data() 
         
     def input_text(self, data) :
         max_sleep_interval = 32  # 최대 대기 시간 설정

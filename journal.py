@@ -37,11 +37,11 @@ class Journal :
         if page <= 1 :
             return (1, 0, "abstract")
         elif page <= 3 :
-            return (1, 1, "abstract")
+            return (1, 2, "abstract")
         elif page <= 10 :
-            return (2, 2, "journal")
+            return (3, 5, "journal")
         else:
-            return (2, 4, "journal")
+            return (3, 8, "journal")
     
     def check_data_type(self) :
         #Pdf : img or text
@@ -53,6 +53,7 @@ class Journal :
             
                 
     def data_clensing_front(self) :      
+        #추후에 수정해야됨!
         text = self.data.lower().replace(" ", "")
         #대소문자 구분 및 공백 제거
                 
@@ -65,46 +66,71 @@ class Journal :
         return True
     
     def data_clensing_back(self):
-        bac_data = "" # Create an empty string bac_data
-        keywords = ["참고", "reference"] # Define the list of keywords to search for
-        found = False  # A flag variable to check if the keywords are found
+        bac_data = "" 
+        keywords = ["acknowl", "감사의", "funding", "contributions"]
+        found = False  
 
-        for i in reversed(range(len(self.back))):  # Iterate through each page index from back to front
-            page = self.back[i]  # Get the page text
-            check = page.lower().replace(" ", "")  # Convert the page text to lower case and remove all spaces
+        for i in reversed(range(len(self.back))):  
+            page = self.back[i]  
+            check = page.lower().replace(" ", "")  
+            print(check)
+            for keyword in keywords:  
+                keyword_index = check.find(keyword)  
 
-            # If either "참고" or "reference" is found in the text
-            if any(keyword in check for keyword in keywords): 
-                # Combine the current and previous page into a single string
-                if i > 0:  # Check if there is a previous page
-                    prev_page = self.back[i - 1]
-                    combined_text = prev_page + page
-                else:
-                    combined_text = page
+                if keyword_index != -1:  
+                    start_index = keyword_index  
+                    end_index = min(len(check), keyword_index + 275)  # Keyword + next 300 characters
+                    bac_data = "\nacknowledgements : " + check[start_index + len(keyword):end_index]  
+                    print("\nfound!\n")
+                    print(bac_data)
+                    self.data += bac_data  
+                    found = True  
+                    break  
 
-                # Convert the combined text to lower case and remove all spaces
-                combined_text = combined_text.lower().replace(" ", "")
-
-                # If either "acknowl" or "감사의" is found in the combined text
-                if "acknowl" in combined_text or "감사의" in combined_text:
-                    for keyword in keywords:  # Iterate through each keyword
-                        keyword_index = combined_text.find(keyword)  # Find the index of the keyword in the text
-
-                        if keyword_index != -1:  # If keyword is found
-                            start_index = max(0, keyword_index - 200)  # Calculate the start index for slicing the string
-                            bac_data = combined_text[start_index:keyword_index]  # Slice the string from start_index to keyword_index
-                            self.data += bac_data  # Append the sliced string to self.data
-                            found = True  # Set the found flag to True
-                            break  # Break the loop
-                else:  # If neither "acknowl" nor "감사의" is found in the combined text
-                    self.data += "acknowledgements 없음"  # Append "acknowledgements 없음" to self.data
-                    found = True  # Set the found flag to True
-
-            if found:  # If the keyword was found, break the loop
+            if found:  
                 break
 
-        if not found:  # If the loop finishes without finding the keywords, append "acknowledgements 없음" to self.data
-            self.data += "acknowledgements 없음"
+        if not found:  
+            self.data += "acknowledgements 없음, 감사의 문구 없음"
+    
+    # def data_clensing_back(self):
+    #     bac_data = "" 
+    #     keywords = ["참고", "reference"] 
+    #     found = False  # A flag variable to check if the keywords are found
+
+    #     for i in reversed(range(len(self.back))):  # Iterate through each page index from back to front
+    #         page = self.back[i]  # Get the page text
+    #         check = page.lower().replace(" ", "")  # Convert the page text to lower case and remove all spaces
+
+            
+    #         if any(keyword in check for keyword in keywords): 
+    #             if i > 0:  
+    #                 prev_page = self.back[i - 1]
+    #                 combined_text = prev_page + page
+    #             else:
+    #                 combined_text = page
+
+    #             combined_text = combined_text.lower().replace(" ", "")
+
+    #             if "acknowl" in combined_text or "감사의" in combined_text or "contributions" in combined_text or "funding" in combined_text:
+    #                 for keyword in keywords:  
+    #                     keyword_index = combined_text.find(keyword)  
+
+    #                     if keyword_index != -1:  
+    #                         start_index = max(0, keyword_index - 800)  
+    #                         bac_data = combined_text[start_index:keyword_index]  
+    #                         self.data += bac_data  
+    #                         found = True  
+    #                         break  
+    #             else:  
+    #                 self.data += "acknowledgements 없음, 감사의 문구 없음"  
+    #                 found = True 
+
+    #         if found:  
+    #             break
+
+    #     if not found:  
+    #         self.data += "acknowledgements 없음, 감사의 문구 없음"
     
     def get_data(self) :
         
