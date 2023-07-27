@@ -11,10 +11,8 @@ class JournalMangaement :
         self.path = path
         self.pdf_list = []
         self.result_data = []
-        self.key = ["title", "title-kor", "author", "author's-affiliation", "acknowledgements"]
-        self.first_q = "title : \ntitle-kor : \n\
-            author : \nauthor's-affiliation : \n\
-            acknowledgements : \n"
+        self.key = ["title", "author", "acknowledgements"]
+        self.first_q = "title : \nauthor : \nacknowledgements : \n"
         # self.key = ["title-eng", "title-kor", "author-eng", "author-kor", "acknowledgments"]
         # self.first_q = "title-English : \ntitle-Korean : \n\
         #     author-English : \nauthor-Korean : \n\
@@ -36,12 +34,13 @@ class JournalMangaement :
         journal.read_text()
         journal.check_data_type()
         if journal.data_type == "image":
-            return {"title": "Image-based PDF", "title-kor" : "Image-based PDF", "author": "Image-based PDF", "author's-affiliation": "Image-based PDF", "acknowledgments": "Image-based PDF"}   
+            return {"title": "Image-based PDF", "author": "Image-based PDF", "acknowledgments": "Image-based PDF"}   
         if journal.data_clensing_front() :
             journal.data_clensing_back()
-        return f"해당 논문에서 {self.first_q} \n지금 너에게 준 형식들로 맞춰서 나에게 알려줘\n 없을 경우 None으로 표시해줘\n" + journal.get_data() 
+        return f"해당 논문에서 {self.first_q} \n지금 너에게 준 형식들로 맞춰서 나에게 알려줘(형식의 텍스트를 절대 바꾸지 말고 꼭 유지해줘)\n 없을 경우 None으로 표시해줘\n" + journal.get_data() 
         
     def input_text(self, data) :
+        max_sleep_interval = 32  # 최대 대기 시간 설정
         while True:
             try:
                 response = openai.ChatCompletion.create(
@@ -55,7 +54,7 @@ class JournalMangaement :
                 return response.choices[0].message.content
             except Exception as e:
                 print(f"Error in OpenAI request: {e}")
-                self.sleep_interval *= 2  # 요청 실패시 대기 시간 2배 증가
+                self.sleep_interval = min(max_sleep_interval, self.sleep_interval * 2)  # 요청 실패시 대기 시간 2배 증가, 최대 대기 시간까지
                 print(f"Waiting for {self.sleep_interval} seconds before retrying.")
                 time.sleep(self.sleep_interval)
     
@@ -70,6 +69,17 @@ class JournalMangaement :
                     break
         self.result_data.append(data)
         print(data)
+    # def result_to_dictionary(self, result): 
+    #     lines = result.split("\n")
+    #     data = {}
+    #     for line in lines:
+    #         for key in self.key:
+    #             parts = line.partition(key+": ")
+    #             if parts[1]:  # If the key is found
+    #                 data[key] = parts[2].strip()  # Strip leading and trailing spaces
+    #                 break
+    #     self.result_data.append(data)
+    #     print(data)
 
 
     
@@ -77,7 +87,7 @@ class JournalMangaement :
         total_files = len(self.pdf_list)  # 총 파일 수 저장
         for i, path in enumerate(self.pdf_list, start=1): 
             try:
-                print(f"Processing file {i} of {total_files}: {path}")  # 현재 처리 중인 파일 정보 출력
+                print(f"\n\nProcessing file {i} of {total_files}: {path}")  # 현재 처리 중인 파일 정보 출력
                 content = self.set_ai_content(path)
                 if isinstance(content, dict):
                     self.result_data.append(content)
