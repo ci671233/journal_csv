@@ -5,6 +5,7 @@ attrs==23.1.0
 certifi==2023.5.7
 chardet==4.0.0
 charset-normalizer==3.2.0
+colorama==0.4.6
 FileHandler==1.0.14
 frozenlist==1.4.0
 idna==2.10
