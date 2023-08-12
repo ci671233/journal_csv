@@ -1,6 +1,9 @@
 from journal import Journal
 from journal_manage import JournalManagement
 from config import *
+import logging
+
+logging.basicConfig(filename='test.log', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
 
 ai_key = OPENAI_KEY
 path = INPUT_PATH
@@ -15,6 +18,3 @@ print("Done processing PDFs.")
 print("Writing data to CSV...")
 jour_manage.data_to_csv()
 print("Done writing data to CSV.")
-
-# 추후 수정 필요한 사항
-# data_clensing_front 함수 수정

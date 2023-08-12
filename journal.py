@@ -2,6 +2,10 @@ import fitz
 import pytesseract
 import os
 from PIL import Image
+import logging
+
+logging.basicConfig(filename='test.log', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
+
 
 class Journal: 
     def __init__(self, path):
@@ -17,6 +21,7 @@ class Journal:
             page = self.doc.load_page(i)
             pix = page.get_pixmap()
             image = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            logging.info(f"Processing file: {self.path}, page: {i}")
 
             if pytesseract.image_to_string(image):
                 self.text_pages.append(i)
@@ -44,12 +49,13 @@ class Journal:
             page = self.doc.load_page(page_num)
             text = page.get_text()
             data += text
+            logging.info(f"Page {page_num}: {text}")  
 
         return data
 
     def search_acknowledgements(self):
         print("Searching for acknowledgements...")
-        keywords = ["acknowl", "감사의", "funding", "contributions", "지원을받아"]
+        keywords = ["acknowl", "감사의", "funding", "contributions", "supportedby", "지원을받아", "지원과제"]
         found = False
 
         for page_num in reversed(self.text_pages):
@@ -72,31 +78,3 @@ class Journal:
             self.acknowledgements = "acknowledgements : none"
         else:
             print("Acknowledgements found.")
-    
-    # def data_clensing_back(self):
-    #     bac_data = "" 
-    #     keywords = ["acknowl", "감사의", "funding", "contributions"]
-    #     found = False  
-
-    #     for i in reversed(range(len(self.back))):  
-    #         page = self.back[i]  
-    #         check = page.lower().replace(" ", "")  
-    #         print(check)
-    #         for keyword in keywords:  
-    #             keyword_index = check.find(keyword)  
-
-    #             if keyword_index != -1:  
-    #                 start_index = keyword_index  
-    #                 end_index = min(len(check), keyword_index + 275)  # Keyword + next 300 characters
-    #                 bac_data = "\nacknowledgements : " + check[start_index + len(keyword):end_index]  
-    #                 print("\nfound!\n")
-    #                 print(bac_data)
-    #                 self.data += bac_data  
-    #                 found = True  
-    #                 break  
-
-    #         if found:  
-    #             break
-
-    #     if not found:  
-    #         self.data += "acknowledgements 없음, 감사의 문구 없음"

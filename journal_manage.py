@@ -65,7 +65,7 @@ class JournalManagement:
         if "authors" not in result:
             result["authors"] = "Unknown Authors"
 
-        print("Received response from AI.") 
+        print("Received response from AI.\n") 
         return result
 
 
