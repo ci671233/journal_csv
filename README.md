@@ -56,7 +56,7 @@
 
 <img width="573" alt="image" src="https://github.com/user-attachments/assets/f8cbdca2-2252-494e-95ca-6c9e864c5bbf" />
 
-## 부족한 점
+## 개선할 점
 - AI 모델의 성능 부족과 텍스트 제한으로 인한 문구 추출 불가
 - 추후 연구로 완전 자동화와 사사표기 문구 추출을 연구 목표로 함
 
